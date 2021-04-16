@@ -35,6 +35,13 @@
                         </item>
                     </items>
                 </search>
+                <list>
+                    <items _delta="merge">
+                        <item id="description" _delta="define">
+                            <rank>40</rank>
+                        </item>
+                    </items>
+                </list>
             </presentation>
         </class>
     </classes>
