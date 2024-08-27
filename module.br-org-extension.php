@@ -1,16 +1,16 @@
 <?php
 
 /**
- * @copyright   Copyright (C) 2021 Björn Rudner
+ * @copyright   Copyright (C) 2021-2024 Björn Rudner
  * @license     https://www.gnu.org/licenses/gpl-3.0.en.html
- * @version     2021-04-15
+ * @version     2024-08-27
  *
  * iTop module definition file
  */
 
 SetupWebPage::AddModule(
     __FILE__, // Path to the current file, all other file names are relative to the directory containing this file
-    'br-org-extension/0.1.0',
+    'br-org-extension/0.2.0',
     array(
         // Identification
         //
@@ -20,16 +20,14 @@ SetupWebPage::AddModule(
         // Setup
         //
         'dependencies' => array(
-            'itop-portal/0.0.0',
+            '(itop-config-mgmt/2.5.0 & itop-config-mgmt/<3.0.0)||itop-structure/3.0.0',
         ),
         'mandatory' => false,
         'visible' => true,
 
         // Components
         //
-        'datamodel' => array(
-            'model.br-org-extension.php'
-        ),
+        'datamodel' => array(),
         'webservice' => array(),
         'data.struct' => array(
             // add your 'structure' definition XML files here,
