@@ -10,7 +10,7 @@
 
 SetupWebPage::AddModule(
     __FILE__, // Path to the current file, all other file names are relative to the directory containing this file
-    'br-org-extension/0.2.1',
+    'br-org-extension/2.7.3',
     array(
         // Identification
         //
