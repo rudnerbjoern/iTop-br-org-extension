@@ -20,16 +20,14 @@ SetupWebPage::AddModule(
         // Setup
         //
         'dependencies' => array(
-            '(itop-config-mgmt/2.5.0 & itop-config-mgmt/<3.0.0)||itop-structure/3.0.0',
+            'itop-config-mgmt/3.1.0',
         ),
         'mandatory' => false,
         'visible' => true,
 
         // Components
         //
-        'datamodel' => array(
-            'model.br-org-extension.php',
-        ),
+        'datamodel' => array(),
         'webservice' => array(),
         'data.struct' => array(
             // add your 'structure' definition XML files here,
