@@ -6,18 +6,172 @@
     -->
     <classes>
         <class id="Organization" _delta="must_exist">
+            <properties>
+                <naming>
+                    <attributes>
+                        <attribute id="name" _delta="delete_if_exists" />
+                        <attribute id="nicename" _delta="define" />
+                    </attributes>
+                </naming>
+            </properties>
             <fields>
+                <field id="nicename" xsi:type="AttributeString" _delta="define">
+                    <sql>nicename</sql>
+                    <default_value>unknown</default_value>
+                    <is_null_allowed>false</is_null_allowed>
+                </field>
+                <field id="organizations_list" xsi:type="AttributeLinkedSet" _delta="define">
+                    <linked_class>Organization</linked_class>
+                    <ext_key_to_me>parent_id</ext_key_to_me>
+                </field>
                 <field id="description" xsi:type="AttributeText" _delta="define">
                     <sql>description</sql>
                     <default_value />
                     <is_null_allowed>true</is_null_allowed>
                 </field>
             </fields>
+            <methods>
+                <method id="GetAttributeFlags" _delta="define">
+                    <static>false</static>
+                    <access>public</access>
+                    <type>Overload-DBObject</type>
+                    <code>
+                        <![CDATA[public function GetAttributeFlags($sAttCode, &$aReasons = array(), $sTargetState = '')
+					    {
+						    // Force the computed field to be read-only, preventing it to be written
+						    if (($sAttCode == 'nicename'))
+							    return(OPT_ATT_READONLY | parent::GetAttributeFlags($sAttCode, $aReasons, $sTargetState));
+						    return parent::GetAttributeFlags($sAttCode, $aReasons, $sTargetState);
+					    }]]>
+                    </code>
+                </method>
+                <method id="GetInitialStateAttributeFlags" _delta="define">
+                    <static>false</static>
+                    <access>public</access>
+                    <type>Overload-DBObject</type>
+                    <code>
+                        <![CDATA[public function GetInitialStateAttributeFlags($sAttCode, &$aReasons = array())
+					    {
+						    // Hide the calculated field in object creation form
+						    if (($sAttCode == 'nicename'))
+							    return(OPT_ATT_HIDDEN | parent::GetInitialStateAttributeFlags($sAttCode, $aReasons));
+						    return parent::GetInitialStateAttributeFlags($sAttCode, $aReasons);
+					    }]]>
+                    </code>
+                </method>
+                <method id="SetNicename" _delta="define">
+                    <static>false</static>
+                    <access>public</access>
+                    <type>Overload-DBObject</type>
+                    <code>
+                        <![CDATA[public function SetNicename()
+{
+    // read the new value of the Name
+    $sName = $this->Get('name');
+
+    // failsafe, the field cannot be empty
+    $sNicename = $sName;
+
+    // get Nicename from Parent
+    $sParentNicename = '';
+
+    if (!(empty($this->Get('parent_id'))))
+    {
+        // try to get the parent Location
+        $oParentOrganization = MetaModel::GetObject('Organization', $this->Get('parent_id'));
+        if (is_object($oParentOrganization))
+        {
+            $sParentNicename = $oParentOrganization->Get('nicename');
+            $sNicename = $sParentNicename.'/'.$sName;
+        }
+    }
+
+    $this->Set('nicename', $sNicename);
+}]]>
+                    </code>
+                </method>
+                <method id="UpdateChilds" _delta="define">
+                    <static>false</static>
+                    <access>public</access>
+                    <type>Overload-DBObject</type>
+                    <code>
+                        <![CDATA[public function UpdateChilds()
+{
+    if (!(empty($this->Get('organizations_list'))))
+    {
+        // Cascade to Child Organizations
+        $oChildSet = $this->Get('organizations_list');
+        while($oChild = $oChildSet->Fetch())
+        {
+            $oChild->SetNicename();
+            $oChild->i_NameChanged = true;
+            $oChild->DBUpdate();
+            if (!(empty($oChild->Get('organizations_list'))))
+            {
+                // Cascade to further childs
+                $oChild->UpdateChilds();
+            }
+        }
+    }
+}]]>
+                    </code>
+                </method>
+                <method id="OnInsert" _delta="define">
+                    <static>false</static>
+                    <access>public</access>
+                    <type>Overload-DBObject</type>
+                    <code>
+                        <![CDATA[public function OnInsert()
+{
+    $this->SetNicename();
+    parent::OnInsert();
+}]]>
+                    </code>
+                </method>
+                <method id="OnUpdate" _delta="define">
+                    <static>false</static>
+                    <access>public</access>
+                    <type>Overload-DBObject</type>
+                    <code>
+                        <![CDATA[public function OnUpdate()
+{
+    $aChanges = $this->ListChanges();
+    if (array_key_exists('name', $aChanges) || array_key_exists('parent_id', $aChanges))
+    {
+        // record in the Organization memory object that the name was changed
+        $this->i_NameChanged = true;
+        $this->SetNicename();
+    }
+    parent::OnUpdate();
+}]]>
+                    </code>
+                </method>
+                <method id="AfterUpdate" _delta="define">
+                    <static>false</static>
+                    <access>public</access>
+                    <type>Overload-DBObject</type>
+                    <code>
+                        <![CDATA[public function AfterUpdate()
+{
+    // The Organization is updated in DB and Name was changed,
+    if (isset($this->i_NameChanged))
+    {
+        // we need to rename the childs
+        $this->UpdateChilds();
+    }
+    parent::AfterUpdate();
+}]]>
+                    </code>
+                </method>
+            </methods>
             <presentation>
                 <details>
                     <items>
                         <item id="description" _delta="define">
                             <rank>25</rank>
+                        </item>
+                        <item id="organizations_list" _delta="define">
+                            <rank>100</rank>
                         </item>
                     </items>
                 </details>
