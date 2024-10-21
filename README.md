@@ -11,8 +11,8 @@ Adds additional fields to the iTop Organization class.
 
 The branch [2.7](https://github.com/rudnerbjoern/iTop-br-org-extension/tree/itop/2.7) is compatible to iTop 2.7 and iTop 3.1.
 
-The branch [main](https://github.com/rudnerbjoern/iTop-br-org-extension/tree/main) will only be compatible to iTop 3.1.
+The branch [main](https://github.com/rudnerbjoern/iTop-br-org-extension/tree/main) will only be compatible to iTop 3.1 and above.
 
 Versions starting with 2.7.x are kept compatible to iTop 2.7
 
-The extension was tested on iTop 2.7.10 and 3.1.1
+The extension was tested on iTop 2.7.10, 3.1.1 and 3.2.0-2
