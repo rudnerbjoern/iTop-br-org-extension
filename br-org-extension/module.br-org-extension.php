@@ -24,6 +24,7 @@ SetupWebPage::AddModule(
         ),
         'mandatory' => false,
         'visible' => true,
+        'installer' => 'OrgExtensionInstaller',
 
         // Components
         //
@@ -48,3 +49,40 @@ SetupWebPage::AddModule(
         ),
     )
 );
+
+if (!class_exists('OrgExtensionInstaller')) {
+    /**
+     * Class OrgExtensionInstaller
+     *
+     * @since v3.1.4
+     */
+    class OrgExtensionInstaller extends ModuleInstallerAPI
+    {
+
+        public static function BeforeWritingConfig(Config $oConfiguration)
+        {
+            // If you want to override/force some configuration values, do it here
+            return $oConfiguration;
+        }
+        public static function AfterDatabaseCreation(Config $oConfiguration, $sPreviousVersion, $sCurrentVersion)
+        {
+            if (version_compare($sPreviousVersion, '3.1.4', '<')) {
+
+                SetupLog::Info("|- Upgrading br-org-extension from '$sPreviousVersion' to '$sCurrentVersion'.");
+
+                $oSearch = DBSearch::FromOQL('SELECT Organization WHERE parent_id = 0');
+                $oSet = new DBObjectSet($oSearch, array(), array());
+                if ($oSet->Count() > 0) {
+                    while ($oOrg = $oSet->Fetch()) {
+                        $sOrgName = $oOrg->Get('name');
+                        $oOrg->i_NameChanged = true;
+                        $oOrg->SetNicename();
+                        $oOrg->DBUpdate();
+                        $sOrgNicename = $oOrg->Get('nicename');
+                        SetupLog::Info("|  |- Organization '$sOrgName' Nicename changed to '$sOrgNicename'.");
+                    }
+                }
+            }
+        }
+    }
+}

@@ -12,4 +12,6 @@ Dict::Add('DE DE', 'German', 'Deutsch', array(
     // Dictionary entries go here
     'Class:Organization/Attribute:description' => 'Beschreibung',
     'Class:Organization/Attribute:description+' => 'Beschreibung der Organisation',
+    'Class:Organization/Attribute:organizations_list' => 'Child Organisationen',
+    'Class:Organization/Attribute:organizations_list+' =>    'Liste aller Organisation, die dieser zugeordnet sind',
 ));
