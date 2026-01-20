@@ -31,56 +31,56 @@
                 </field>
             </fields>
             <event_listeners>
-                <event_listener id="EvtSetInitialNicenameAttributeFlags">
+                <event_listener id="OnOrganizationSetInitialAttributesFlagsNicename">
                     <event>EVENT_DB_SET_INITIAL_ATTRIBUTES_FLAGS</event>
                     <rank>10</rank>
-                    <callback>EvtSetInitialNicenameAttributeFlags</callback>
+                    <callback>OnOrganizationSetInitialAttributesFlagsNicename</callback>
                 </event_listener>
-                <event_listener id="EvtSetNicenameAttributeFlags">
+                <event_listener id="OnOrganizationSetAttributesFlagsNicename">
                     <event>EVENT_DB_SET_ATTRIBUTES_FLAGS</event>
                     <rank>10</rank>
-                    <callback>EvtSetNicenameAttributeFlags</callback>
+                    <callback>OnOrganizationSetAttributesFlagsNicename</callback>
                 </event_listener>
-                <event_listener id="EvtBeforeNicenameWrite">
+                <event_listener id="OnOrganizationBeforeWriteNicename">
                     <event>EVENT_DB_BEFORE_WRITE</event>
                     <rank>10</rank>
-                    <callback>EvtBeforeNicenameWrite</callback>
+                    <callback>OnOrganizationBeforeWriteNicename</callback>
                 </event_listener>
-                <event_listener id="EvtAfterNicenameWrite">
+                <event_listener id="OnOrganizationAfterWriteNicename">
                     <event>EVENT_DB_AFTER_WRITE</event>
                     <rank>10</rank>
-                    <callback>EvtAfterNicenameWrite</callback>
+                    <callback>OnOrganizationAfterWriteNicename</callback>
                 </event_listener>
             </event_listeners>
             <methods>
-                <method id="EvtSetInitialNicenameAttributeFlags">
+                <method id="OnOrganizationSetInitialAttributesFlagsNicename">
                     <static>false</static>
                     <access>public</access>
                     <type>EventListener</type>
                     <code><![CDATA[
-    public function EvtSetInitialNicenameAttributeFlags(Combodo\iTop\Service\Events\EventData $oEventData)
+    public function OnOrganizationSetInitialAttributesFlagsNicename(Combodo\iTop\Service\Events\EventData $oEventData)
     {
         $this->ForceInitialAttributeFlags('nicename', OPT_ATT_HIDDEN);
     }
   ]]></code>
                 </method>
-                <method id="EvtSetNicenameAttributeFlags">
+                <method id="OnOrganizationSetAttributesFlagsNicename">
                     <static>false</static>
                     <access>public</access>
                     <type>EventListener</type>
                     <code><![CDATA[
-    public function EvtSetNicenameAttributeFlags(Combodo\iTop\Service\Events\EventData $oEventData)
+    public function OnOrganizationSetAttributesFlagsNicename(Combodo\iTop\Service\Events\EventData $oEventData)
     {
         $this->ForceAttributeFlags('nicename', OPT_ATT_READONLY);
     }
   ]]></code>
                 </method>
-                <method id="EvtBeforeNicenameWrite">
+                <method id="OnOrganizationBeforeWriteNicename">
                     <static>false</static>
                     <access>public</access>
                     <type>EventListener</type>
                     <code><![CDATA[
-    public function EvtBeforeNicenameWrite(Combodo\iTop\Service\Events\EventData $oEventData)
+    public function OnOrganizationBeforeWriteNicename(Combodo\iTop\Service\Events\EventData $oEventData)
     {
         if ($oEventData->Get('is_new')) {
             $this->SetNicename();
@@ -97,12 +97,12 @@
     }
   ]]></code>
                 </method>
-                <method id="EvtAfterNicenameWrite">
+                <method id="OnOrganizationAfterWriteNicename">
                     <static>false</static>
                     <access>public</access>
                     <type>EventListener</type>
                     <code><![CDATA[
-    public function EvtAfterNicenameWrite(Combodo\iTop\Service\Events\EventData $oEventData)
+    public function OnOrganizationAfterWriteNicename(Combodo\iTop\Service\Events\EventData $oEventData)
     {
         // The Organization is updated in DB and Name was changed,
         if (isset($this->i_NameChanged))
