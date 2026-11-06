@@ -8,8 +8,8 @@ php scripts/prepare-release.php 3.2.3
 ```
 
 This updates the extension manifest version, module registration version, and
-manifest release date together. It also updates the date-based `@version` headers
-in the module and both German and English dictionaries, then runs `tests/run.php`.
+manifest release date together, then runs `tests/run.php`.
+Dictionary files remain unchanged.
 The iTop minimum version, `itop-config-mgmt` dependency, data-model format,
 and historical migration versions (`@since`, upgrade thresholds) remain unchanged.
 The default date uses
@@ -20,7 +20,7 @@ php scripts/prepare-release.php 3.2.3 2026-11-06
 ```
 
 The version must be newer than the existing version and use `X.Y.Z` format.
-The current manifest and module versions must match. All inputs and all four file
+The current manifest and module versions must match. All inputs and both file
 contents are checked before writing. A write failure triggers an attempt to
 restore all originals; this is not a transaction across filesystem failures.
 Existing formatting outside the release metadata is preserved.
