@@ -2,22 +2,6 @@
 
 declare(strict_types=1);
 
-/** Update exactly one date-based PHP file version while preserving formatting. */
-function prepareReleaseFileDate(string $content, string $date): string
-{
-    $updated = preg_replace_callback(
-        '~^( \* @version[ \t]+)\d{4}-\d{2}-\d{2}([ \t]*\r?)$~m',
-        static fn (array $match): string => $match[1] . $date . $match[2],
-        $content,
-        -1,
-        $count
-    );
-    if ($updated === null || $count !== 1) {
-        throw new RuntimeException('Expected exactly one date-based @version header per PHP source file.');
-    }
-    return $updated;
-}
-
 /** Validate all inputs before producing updated manifest and module contents. */
 function prepareReleaseContents(string $manifest, string $module, string $version, string $date): array
 {
@@ -68,18 +52,14 @@ function prepareReleaseContents(string $manifest, string $module, string $versio
         static fn (): string => "'br-org-extension/$version'",
         $module
     );
-    return [$manifest, prepareReleaseFileDate($module, $date)];
+    return [$manifest, $module];
 }
 
 /** Prepare all release metadata before writing any project file. */
 function prepareReleaseFiles(array $contents, string $version, string $date): array
 {
     $module = 'br-org-extension/module.br-org-extension.php';
-    $dictionaries = [
-        'br-org-extension/dictionaries/de.dict.br-org-extension.php',
-        'br-org-extension/dictionaries/en.dict.br-org-extension.php',
-    ];
-    foreach (array_merge(['extension.xml', $module], $dictionaries) as $path) {
+    foreach (['extension.xml', $module] as $path) {
         if (!isset($contents[$path]) || !is_string($contents[$path])) {
             throw new RuntimeException('Missing release source file: ' . $path);
         }
@@ -87,9 +67,6 @@ function prepareReleaseFiles(array $contents, string $version, string $date): ar
     [$contents['extension.xml'], $contents[$module]] = prepareReleaseContents(
         $contents['extension.xml'], $contents[$module], $version, $date
     );
-    foreach ($dictionaries as $path) {
-        $contents[$path] = prepareReleaseFileDate($contents[$path], $date);
-    }
     return $contents;
 }
 
@@ -103,8 +80,6 @@ if (realpath($_SERVER['SCRIPT_FILENAME'] ?? '') === __FILE__) {
         $paths = [
             'extension.xml',
             'br-org-extension/module.br-org-extension.php',
-            'br-org-extension/dictionaries/de.dict.br-org-extension.php',
-            'br-org-extension/dictionaries/en.dict.br-org-extension.php',
         ];
         $originals = [];
         foreach ($paths as $path) {

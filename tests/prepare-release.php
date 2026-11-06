@@ -16,7 +16,7 @@ $tests = [
         [$updatedManifest, $updatedModule] = prepareReleaseContents($manifest, $module, $next, '2028-02-29');
         $xml = simplexml_load_string($updatedManifest);
         if ((string) $xml->version !== $next || (string) $xml->release_date !== '2028-02-29'
-            || $updatedModule !== prepareReleaseFileDate(str_replace("'br-org-extension/$current'", "'br-org-extension/$next'", $module), '2028-02-29')
+            || $updatedModule !== str_replace("'br-org-extension/$current'", "'br-org-extension/$next'", $module)
             || preg_replace('~<(version|release_date)>.*?</\1>~s', '', $updatedManifest)
                 !== preg_replace('~<(version|release_date)>.*?</\1>~s', '', $manifest)) {
             throw new RuntimeException('Unexpected release metadata or unrelated edits.');
@@ -32,7 +32,6 @@ $cases = [
     'reject invalid calendar date' => [$manifest, $module, $next, '2027-02-29'],
     'reject ambiguous module version' => [$manifest, $module . $module, $next, '2028-02-29'],
     'reject mismatched module version' => [$manifest, str_replace("'br-org-extension/$current'", "'br-org-extension/0.0.0'", $module), $next, '2028-02-29'],
-    'reject missing module date header' => [$manifest, str_replace('@version', '@removed', $module), $next, '2028-02-29'],
     'reject missing date element' => [preg_replace('~<release_date>.*?</release_date>~s', '', $manifest), $module, $next, '2028-02-29'],
 ];
 foreach ($cases as $name => $arguments) {
@@ -58,7 +57,7 @@ $tests['update all release versions and dates while preserving compatibility and
             if ($path === 'extension.xml') {
                 continue;
             }
-            $expected = preg_replace('/(@version[ \t]+)\d{4}-\d{2}-\d{2}/', '${1}2028-02-29', $original);
+            $expected = $original;
             if (str_contains($path, '/module.')) {
                 $expected = str_replace("'br-org-extension/$current'", "'br-org-extension/$next'", $expected);
             }
@@ -72,24 +71,16 @@ $tests['update all release versions and dates while preserving compatibility and
             throw new RuntimeException('The iTop minimum version must remain unchanged.');
         }
     };
-foreach (['missing', 'ambiguous', 'absent'] as $case) {
-    $tests["reject $case dictionary metadata before producing release files"] =
-        static function () use ($sources, $next, $case): void {
-            $path = 'br-org-extension/dictionaries/de.dict.br-org-extension.php';
-            if ($case === 'absent') {
-                unset($sources[$path]);
-            } else {
-                $sources[$path] = $case === 'missing'
-                    ? str_replace('@version', '@removed', $sources[$path])
-                    : $sources[$path] . $sources[$path];
-            }
-            try {
-                prepareReleaseFiles($sources, $next, '2028-02-29');
-            } catch (RuntimeException $error) {
-                return;
-            }
-            throw new RuntimeException('Invalid dictionary metadata was accepted.');
-        };
+foreach (['extension.xml', 'br-org-extension/module.br-org-extension.php'] as $path) {
+    $tests['reject missing release source ' . $path] = static function () use ($sources, $next, $path): void {
+        unset($sources[$path]);
+        try {
+            prepareReleaseFiles($sources, $next, '2028-02-29');
+        } catch (RuntimeException $error) {
+            return;
+        }
+        throw new RuntimeException('Missing release source was accepted.');
+    };
 }
 
 return $tests;
